@@ -19,6 +19,11 @@ export default {
     page: 1,
     maxRows: 20
   },
+  spanner: {
+    projectId: process.env.SPANNER_PROJECT_ID || '',
+    instanceId: process.env.SPANNER_INSTANCE_ID || '',
+    databaseId: process.env.SPANNER_DATABASE_ID || 'node '
+  },
   auth: {
     saltRounds: process.env.SALT_ROUNDS || 11,
     accessTokenDuration: process.env.ACCESS_TOKEN_DURATION || '10m',
