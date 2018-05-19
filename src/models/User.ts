@@ -1,15 +1,11 @@
-import bookshelf from '../config/bookshelf';
-
+import SpannerModel from './SpannerModel';
 import Table from '../resources/enums/Table';
 
-class User extends bookshelf.Model<User> {
-  get tableName(): string {
-    return Table.USERS;
-  }
-
-  get hasTimestamps(): boolean {
-    return true;
-  }
+/**
+ * User model.
+ */
+class User extends SpannerModel {
+  public static tableName = Table.USERS;
 }
 
 export default User;
