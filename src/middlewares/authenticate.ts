@@ -32,7 +32,7 @@ async function authenticate(req: Request, res: Response, next: NextFunction) {
     logger.debug('JWT: Verifying token - ', req.headers.authorization, res.locals.accessToken);
     const response: any = jwt.verifyAccessToken(res.locals.accessToken);
 
-    res.locals.loggedInPayload = response;
+    res.locals.loggedInPayload = response.data;
 
     logger.debug('JWT: Authentication verified - ', JSON.stringify(res.locals.loggedInPayload, null, 2));
 

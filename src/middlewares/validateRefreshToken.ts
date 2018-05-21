@@ -32,7 +32,7 @@ async function validateRefreshToken(req: Request, res: Response, next: NextFunct
     logger.debug('JWT: Verifying token - ', res.locals.refreshToken);
     const response: any = jwt.verifyRefreshToken(res.locals.refreshToken);
 
-    res.locals.jwtPayload = response;
+    res.locals.jwtPayload = response.data;
 
     logger.debug('JWT: Authentication verified - ', JSON.stringify(res.locals.jwtPayload, null, 2));
 

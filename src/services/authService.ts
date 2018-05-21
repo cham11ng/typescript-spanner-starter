@@ -67,8 +67,13 @@ export async function login(loginPayload: LoginPayload) {
 export async function refresh(token: string, jwtPayload: JWTPayload) {
   logger.debug('User Session: Fetching session of token -', token);
 
-  const userTable = await spanner.table(Table.USERS);
-  const [result] = await userTable.read({ keySet: { all: true } });
+  const [[result]] = await spanner.run({
+    json: true,
+    sql: 'SELECT * FROM user_sessions where token = @token limit 1',
+    params: {
+      token
+    }
+  });
 
   logger.debug('User Session: fetched session -', JSON.stringify(result, null, 2));
 
