@@ -3,13 +3,12 @@ import logger from '../utils/logger';
 import config from '../config/config';
 import spanner from '../config/spanner';
 import * as bcrypt from '../utils/bcrypt';
-import Table from '../resources/enums/Table';
 import JWTPayload from '../domain/misc/JWTPayload';
+import SessionInfo from '../domain/misc/SessionInfo';
 import ForbiddenError from '../exceptions/ForbiddenError';
 import LoginPayload from '../domain/requests/LoginPayload';
 import * as sessionService from '../services/sessionService';
 import UnauthorizedError from '../exceptions/UnauthorizedError';
-import SessionInfo from '../domain/misc/SessionInfo';
 
 const { errors } = config;
 
