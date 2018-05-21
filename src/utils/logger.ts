@@ -5,6 +5,7 @@ import * as winston from 'winston';
 
 import app from '../config/config';
 
+const { environment } = app;
 const { level, maxSize, maxFiles, datePattern, dir: logDir } = app.logging;
 
 if (!fs.existsSync(logDir)) {
@@ -21,7 +22,7 @@ const transports = [
   })
 ];
 
-if (process.env.NODE_ENV !== 'production') {
+if (environment === 'development') {
   transports.push(
     new winston.transports.Console({
       level,

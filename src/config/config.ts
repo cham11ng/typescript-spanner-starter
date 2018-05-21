@@ -13,6 +13,7 @@ export default {
   messages,
   name: app.name,
   version: app.version,
+  environment: process.env.NODE_ENV || 'development',
   host: process.env.APP_HOST || '127.0.0.1',
   port: (isTestEnvironment ? process.env.TEST_APP_PORT : process.env.APP_PORT) || '8000',
   pagination: {
