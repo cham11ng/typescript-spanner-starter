@@ -34,19 +34,20 @@ export async function insert(params: UserPayload): Promise<UserDetail> {
 
   const password = await bcrypt.hash(params.password);
 
-  const userPayload = {
+  const userInfo = {
     ...params,
     password,
-    id: 1,
+    id: 3,
     role_id: Role.NORMAL_USER,
     created_at: new Date(),
     updated_at: new Date()
   };
 
   const userTable = await spanner.table(Table.USERS);
-  const [result] = await userTable.insert([userPayload]);
+  const [result] = await userTable.insert([userInfo]);
 
-  logger.debug('Inserted user successfully:', JSON.stringify(result, null, 2));
+  logger.debug('User insert response:', JSON.stringify(result, null, 2));
+  logger.debug('Inserted user successfully:', JSON.stringify(userInfo, null, 2));
 
-  return camelize(userPayload);
+  return camelize(userInfo);
 }
