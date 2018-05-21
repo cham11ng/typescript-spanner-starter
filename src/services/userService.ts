@@ -1,8 +1,9 @@
 import logger from '../utils/logger';
+import * as uuid from '../utils/uuid';
 import spanner from '../config/spanner';
 import * as bcrypt from '../utils/bcrypt';
+import * as object from '../utils/object';
 import Role from '../resources/enums/Role';
-import { camelize } from '../utils/object';
 import Table from '../resources/enums/Table';
 import UserDetail from '../domain/entities/UserDetail';
 import UserPayload from '../domain/requests/UserPayload';
@@ -24,7 +25,7 @@ export async function fetchAll(): Promise<UserDetail[]> {
 
   logger.debug('Fetched all users successfully:', JSON.stringify(users, null, 2));
 
-  return camelize(users);
+  return object.camelize(users);
 }
 
 /**
@@ -41,7 +42,7 @@ export async function insert(params: UserPayload): Promise<UserDetail> {
   const userInfo = {
     ...params,
     password,
-    id: 1,
+    id: uuid.generate(),
     role_id: Role.NORMAL_USER,
     created_at: new Date(),
     updated_at: new Date()
@@ -53,5 +54,5 @@ export async function insert(params: UserPayload): Promise<UserDetail> {
   logger.debug('User insert response:', JSON.stringify(result, null, 2));
   logger.debug('Inserted user successfully:', JSON.stringify(userInfo, null, 2));
 
-  return camelize(userInfo);
+  return object.camelize(userInfo);
 }

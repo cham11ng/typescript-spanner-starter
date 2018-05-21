@@ -1,4 +1,5 @@
 import logger from '../utils/logger';
+import * as uuid from '../utils/uuid';
 import spanner from '../config/spanner';
 import * as object from '../utils/object';
 import Table from '../resources/enums/Table';
@@ -16,7 +17,7 @@ export async function create(params: UserSessionPayload): Promise<UserSessionDet
   logger.debug('User Session: Creating session - ', JSON.stringify(params, null, 2));
 
   const userSessionInfo = {
-    id: 2,
+    id: uuid.generate(),
     token: params.token,
     user_id: params.userId,
     created_at: new Date(),
