@@ -28,15 +28,15 @@
     "drop:schema": "ts-node scripts/drop-schema",
     "update:schema": "ts-node scripts/update-schema",
     "test": "jest --config jest.json",
-    "lint": "tslint src/**/*.{ts,js} test/**/*.{ts,js}",
-    "lint:fix": "tslint --fix src/**/*.{ts,js} test/**/*.{ts,js}",
-    "prettify": "prettier --single-quote --parser typescript --print-width 120 --write scripts/*.ts src/**/*.{ts,js} test/**/*.{ts,js}"
+    "lint": "tslint src/**/*.{ts} test/**/*.{ts}",
+    "lint:fix": "tslint --fix src/**/*.{ts} test/**/*.{ts}",
+    "prettify": "prettier --single-quote --parser typescript --print-width 120 --write scripts/*.ts src/**/*.{ts} test/**/*.{ts}"
   },
   "lint-staged": {
     "linters": {
       "*.{ts, js}": [
-        "tslint --fix src/**/*.{ts,js} test/**/*.{ts,js}",
-        "prettier --single-quote --parser typescript --print-width 120 --write scripts/*.ts src/**/*.{ts,js} test/**/*.{ts,js}",
+        "tslint --fix src/**/*.{ts} test/**/*.{ts}",
+        "prettier --single-quote --parser typescript --print-width 120 --write scripts/*.ts src/**/*.{ts} test/**/*.{ts}",
         "git add"
       ]
     }
