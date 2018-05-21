@@ -15,7 +15,7 @@ const USER_SESSIONS = `DROP TABLE user_sessions`;
 
     await operation.promise();
 
-    logger.debug('Tables dropped');
+    logger.debug('Tables dropped.');
   } catch (err) {
     logger.error('ERROR:', JSON.stringify({ message: err.message, detail: err.details }, null, 2));
   }

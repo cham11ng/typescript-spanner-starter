@@ -16,11 +16,15 @@ export async function fetchAll(): Promise<UserDetail[]> {
   logger.debug('Fetching users from database:');
 
   const userTable = await spanner.table(Table.USERS);
-  const [users] = await userTable.read({ columns: ['id', 'role_id', 'name', 'email'], keySet: { all: true } });
+  const [users] = await userTable.read({
+    json: true,
+    keySet: { all: true },
+    columns: ['id', 'role_id', 'name', 'email']
+  });
 
   logger.debug('Fetched all users successfully:', JSON.stringify(users, null, 2));
 
-  return users;
+  return camelize(users);
 }
 
 /**
@@ -37,7 +41,7 @@ export async function insert(params: UserPayload): Promise<UserDetail> {
   const userInfo = {
     ...params,
     password,
-    id: 3,
+    id: 1,
     role_id: Role.NORMAL_USER,
     created_at: new Date(),
     updated_at: new Date()

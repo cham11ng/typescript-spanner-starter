@@ -3,15 +3,15 @@ import { Request, Response, NextFunction } from 'express';
 import * as jwt from '../utils/jwt';
 import logger from '../utils/logger';
 import config from '../config/config';
-import JWTError from './../resources/enums/JWTError';
+import ErrorType from './../resources/enums/ErrorType';
 import BadRequestError from '../exceptions/BadRequestError';
 import UnauthorizedError from '../exceptions/UnauthorizedError';
 
 const { errors } = config;
 
 const tokenErrorMessageMap: any = {
-  [JWTError.INVALID]: errors.invalidToken,
-  [JWTError.EXPIRED]: errors.refreshTokenExpired
+  [ErrorType.INVALID]: errors.invalidToken,
+  [ErrorType.EXPIRED]: errors.refreshTokenExpired
 };
 
 /**
@@ -31,7 +31,9 @@ async function validateRefreshToken(req: Request, res: Response, next: NextFunct
 
     logger.debug('JWT: Verifying token - ', res.locals.refreshToken);
     const response: any = jwt.verifyRefreshToken(res.locals.refreshToken);
-    res.locals.jwtPayload = response.encryptedData;
+
+    res.locals.jwtPayload = response;
+
     logger.debug('JWT: Authentication verified - ', JSON.stringify(res.locals.jwtPayload, null, 2));
 
     next();

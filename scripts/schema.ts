@@ -24,10 +24,9 @@ const USER_SESSIONS = `
     id INT64 NOT NULL,
     token STRING(MAX) NOT NULL,
     user_id INT64 NOT NULL,
-    is_active BOOL NOT NULL,
     created_at TIMESTAMP NOT NULL,
     updated_at TIMESTAMP NOT NULL
-  ) PRIMARY KEY (id, user_id)`;
+  ) PRIMARY KEY (token, user_id)`;
 
 (async () => {
   const request = [USER_ROLES, USERS, USER_SESSIONS];

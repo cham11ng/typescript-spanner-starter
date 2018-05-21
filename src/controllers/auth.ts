@@ -60,8 +60,11 @@ export async function refresh(req: Request, res: Response, next: NextFunction) {
  */
 export async function logout(req: Request, res: Response, next: NextFunction) {
   try {
-    const token = String(res.locals.refreshToken);
-    await authService.logout(token);
+    const {
+      refreshToken: token,
+      jwtPayload: { userId }
+    } = res.locals;
+    await authService.logout({ token, userId });
 
     res.status(HTTPStatus.OK).json({
       code: HTTPStatus.OK,

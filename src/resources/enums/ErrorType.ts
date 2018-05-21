@@ -1,9 +1,9 @@
 /**
- * List of JWTError.
+ * List of ErrorType.
  */
-enum JWTError {
+enum ErrorType {
   INVALID = 'JsonWebTokenError',
   EXPIRED = 'TokenExpiredError'
 }
 
-export default JWTError;
+export default ErrorType;
