@@ -10,12 +10,12 @@ const USER_SESSIONS = `DROP TABLE user_sessions`;
   try {
     const [operation] = await spanner.updateSchema(request);
 
-    logger.debug('Droping tables ...');
-    logger.debug('Waiting for operation to complete ...');
+    logger.info('Droping tables: Waiting for operation to complete.');
+    logger.info('Do not close [x]');
 
     await operation.promise();
 
-    logger.debug('Tables dropped.');
+    logger.info('Tables dropped.');
   } catch (err) {
     logger.error('ERROR:', JSON.stringify({ message: err.message, detail: err.details }, null, 2));
   }

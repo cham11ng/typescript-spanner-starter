@@ -3,27 +3,27 @@ import spanner from '../src/config/spanner';
 
 const USER_ROLES = `
   CREATE TABLE user_roles (
-    id INT64 NOT NULL,
-    name STRING(50) NOT NULL,
-    description STRING(100),
+    id STRING(MAX) NOT NULL,
+    name STRING(MAX) NOT NULL,
+    description STRING(MAX)
   ) PRIMARY KEY (id)`;
 
 const USERS = `
   CREATE TABLE users (
-    id INT64 NOT NULL,
+    id STRING(MAX) NOT NULL,
     name STRING(MAX) NOT NULL,
     email STRING(MAX) NOT NULL,
     password STRING(MAX) NOT NULL,
-    role_id INT64 NOT NULL,
+    role_id STRING(MAX) NOT NULL,
     created_at TIMESTAMP NOT NULL,
     updated_at TIMESTAMP NOT NULL
   ) PRIMARY KEY (id, role_id)`;
 
 const USER_SESSIONS = `
   CREATE TABLE user_sessions (
-    id INT64 NOT NULL,
+    id STRING(MAX) NOT NULL,
     token STRING(MAX) NOT NULL,
-    user_id INT64 NOT NULL,
+    user_id STRING(MAX) NOT NULL,
     created_at TIMESTAMP NOT NULL,
     updated_at TIMESTAMP NOT NULL
   ) PRIMARY KEY (token, user_id)`;
@@ -33,12 +33,12 @@ const USER_SESSIONS = `
   try {
     const [operation] = await spanner.updateSchema(request);
 
-    logger.debug('Updating schema ...');
-    logger.debug('Waiting for operation to complete ...');
+    logger.info('Updating Schema: Waiting for operation to complete.');
+    logger.info('Do not close [x]');
 
     await operation.promise();
 
-    logger.debug('Schema updated.');
+    logger.info('Schema updated.');
   } catch (err) {
     logger.error('ERROR:', JSON.stringify({ message: err.message, detail: err.details }, null, 2));
   }
