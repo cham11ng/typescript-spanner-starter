@@ -28,16 +28,22 @@ export const resetSchema = Joi.object()
       .max(100)
       .label('Email')
       .required(),
-    oldPassword: Joi.string()
+    password: Joi.string()
       .min(6)
       .max(100)
       .label('Password')
       .required(),
-    newPassword: Joi.string()
-      .min(6)
-      .max(100)
-      .label('Password')
+    password_confirmation: Joi.any()
+      .valid(Joi.ref('password'))
       .required()
+      .label('Confirmation Password')
+      .options({
+        language: {
+          any: {
+            allowOnly: 'must match password'
+          }
+        }
+      })
   });
 
 export const forgotSchema = Joi.object()

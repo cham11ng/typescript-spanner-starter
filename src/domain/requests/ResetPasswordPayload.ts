@@ -4,8 +4,7 @@
 interface ResetPasswordPayload {
   token: string;
   email: string;
-  oldPassword: string;
-  newPassword: string;
+  password: string;
 }
 
 export default ResetPasswordPayload;

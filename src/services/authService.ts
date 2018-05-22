@@ -13,6 +13,7 @@ import LoginPayload from '../domain/requests/LoginPayload';
 import * as sessionService from '../services/sessionService';
 import roleToScopeMap from '../resources/maps/roleToScopeMap';
 import UnauthorizedError from '../exceptions/UnauthorizedError';
+import ResetPasswordPayload from '../domain/requests/ResetPasswordPayload';
 import ForgotPasswordPayload from '../domain/requests/ForgotPasswordPayload';
 
 const { errors } = lang;
@@ -146,4 +147,49 @@ export async function forgot(forgotPasswordPayload: ForgotPasswordPayload) {
   const [result] = await resetPasswordTokenTable.insert([resetPasswordTokenInfo]);
 
   logger.debug('Forgot Password: Token inserted successfully -', JSON.stringify(result, null, 2));
+}
+
+/**
+ * Reset password using verification.
+ *
+ * @param {SessionInfo} session
+ */
+export async function reset(forgotPasswordPayload: ResetPasswordPayload) {
+  const { token, email } = forgotPasswordPayload;
+
+  const [[forgotPasswordToken]] = await spanner.run({
+    json: true,
+    sql: `SELECT * FROM reset_password_tokens 
+        INNER JOIN users 
+        ON reset_password_tokens.user_id = users.id 
+        WHERE email = @email
+        AND token = @token`,
+    params: {
+      email,
+      token
+    }
+  });
+
+  logger.debug('Forgot Password: Fetched token by token and email -', JSON.stringify(forgotPasswordToken, null, 2));
+
+  if (!forgotPasswordToken) {
+    throw new NotFoundError(errors.invalidToken);
+  }
+
+  const password = await bcrypt.hash(forgotPasswordPayload.password);
+  const userInfo = {
+    password,
+    id: forgotPasswordToken.user_id,
+    role_id: forgotPasswordToken.role_id
+  };
+
+  logger.debug('Forgot Password: Updating user with new password -', JSON.stringify(userInfo, null, 2));
+  const userTable = await spanner.table(Table.USERS);
+  const [updateResult] = await userTable.update([userInfo]);
+  logger.debug('Forgot Password: Updated user with new password -', JSON.stringify(updateResult, null, 2));
+
+  logger.debug('Forgot Password: Deleting reset password token -', JSON.stringify(forgotPasswordToken, null, 2));
+  const resetPasswordTokenTable = spanner.table(Table.RESET_PASSWORD_TOKENS);
+  const [result] = await resetPasswordTokenTable.deleteRows([[token, forgotPasswordToken.user_id]]);
+  logger.debug('Forgot Password: Token removed successfully -', JSON.stringify(result, null, 2));
 }
