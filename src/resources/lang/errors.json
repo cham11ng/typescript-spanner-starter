@@ -1,5 +1,6 @@
 {
   "portInUse": "Port is already in use.",
+  "userNotFound": "User does not exist.",
   "invalidToken": "Your token is invalid.",
   "invalidCredentials": "Invalid Credentials",
   "accessTokenExpired": "Access token expired.",
