@@ -1,6 +1,6 @@
+import lang from '../config/lang';
 import * as jwt from '../utils/jwt';
 import logger from '../utils/logger';
-import config from '../config/config';
 import spanner from '../config/spanner';
 import * as bcrypt from '../utils/bcrypt';
 import JWTPayload from '../domain/misc/JWTPayload';
@@ -9,8 +9,9 @@ import ForbiddenError from '../exceptions/ForbiddenError';
 import LoginPayload from '../domain/requests/LoginPayload';
 import * as sessionService from '../services/sessionService';
 import UnauthorizedError from '../exceptions/UnauthorizedError';
+import roleToScopeMap from '../resources/maps/roleToScopeMap';
 
-const { errors } = config;
+const { errors } = lang;
 
 /**
  * Create user session for valid user login.
@@ -39,15 +40,18 @@ export async function login(loginPayload: LoginPayload) {
     logger.debug('Login: Password match status -', isSame);
 
     if (isSame) {
-      const { name, roleId, id: userId } = result;
-      const loggedInUser = { name, email, userId, roleId };
+      const { name, role_id: roleId, id: userId } = result;
 
-      const refreshToken = jwt.generateRefreshToken(loggedInUser);
+      const scopes = roleToScopeMap[roleId];
+      const jwtPayload = { name, email, userId, roleId };
+      logger.debug('JWT: Refresh token payload -', JSON.stringify(jwtPayload, null, 2));
+      const refreshToken = jwt.generateRefreshToken(jwtPayload);
 
-      const userSessionPayload = { userId, token: refreshToken };
-      const session = await sessionService.create(userSessionPayload);
+      const session = await sessionService.create({ userId, token: refreshToken });
 
-      const accessToken = jwt.generateAccessToken({ ...loggedInUser, sessionId: session.id });
+      const loggedInUser = { ...jwtPayload, scopes, sessionId: session.id };
+      logger.debug('JWT: Access token payload -', JSON.stringify(loggedInUser, null, 2));
+      const accessToken = jwt.generateAccessToken(loggedInUser);
 
       return { refreshToken, accessToken };
     }
@@ -80,7 +84,11 @@ export async function refresh(token: string, jwtPayload: JWTPayload) {
     throw new ForbiddenError(errors.sessionNotMaintained);
   }
 
-  const accessToken = jwt.generateAccessToken({ ...jwtPayload, sessionId: result.id });
+  const scopes = roleToScopeMap[jwtPayload.roleId];
+  const loggedInUser = { ...jwtPayload, scopes, sessionId: result.id };
+  logger.debug('JWT: Access token payload -', JSON.stringify(loggedInUser, null, 2));
+
+  const accessToken = jwt.generateAccessToken(loggedInUser);
   logger.debug('JWT: New access token generated -', accessToken);
 
   return { accessToken };
