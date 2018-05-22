@@ -1,16 +1,12 @@
 import * as dotenv from 'dotenv';
 
 import app from '../../package.json';
-import errors from '../resources/lang/errors.json';
-import messages from '../resources/lang/messages.json';
 
 dotenv.config();
 
 const isTestEnvironment = process.env.NODE_ENV === 'test';
 
 export default {
-  errors,
-  messages,
   name: app.name,
   version: app.version,
   environment: process.env.NODE_ENV || 'development',
@@ -23,7 +19,7 @@ export default {
   spanner: {
     projectId: process.env.SPANNER_PROJECT_ID || '',
     instanceId: process.env.SPANNER_INSTANCE_ID || '',
-    databaseId: process.env.SPANNER_DATABASE_ID || 'node '
+    databaseId: process.env.SPANNER_DATABASE_ID || ''
   },
   auth: {
     saltRounds: process.env.SALT_ROUNDS || 11,
