@@ -28,8 +28,16 @@ const USER_SESSIONS = `
     updated_at TIMESTAMP NOT NULL
   ) PRIMARY KEY (token, user_id)`;
 
+const RESET_PASSWORD_TOKENS = `
+  CREATE TABLE reset_password_tokens (
+    token STRING(MAX) NOT NULL,
+    user_id STRING(MAX) NOT NULL,
+    created_at TIMESTAMP NOT NULL
+  ) PRIMARY KEY (token, user_id)`;
+
 (async () => {
-  const request = [USER_ROLES, USERS, USER_SESSIONS];
+  const request = [USER_ROLES, USERS, USER_SESSIONS, RESET_PASSWORD_TOKENS];
+
   try {
     const [operation] = await spanner.updateSchema(request);
 
