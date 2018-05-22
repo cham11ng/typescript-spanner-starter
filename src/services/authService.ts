@@ -1,15 +1,19 @@
 import lang from '../config/lang';
 import * as jwt from '../utils/jwt';
 import logger from '../utils/logger';
+import * as uuid from '../utils/uuid';
 import spanner from '../config/spanner';
 import * as bcrypt from '../utils/bcrypt';
+import Table from '../resources/enums/Table';
 import JWTPayload from '../domain/misc/JWTPayload';
 import SessionInfo from '../domain/misc/SessionInfo';
+import NotFoundError from '../exceptions/NotFoundError';
 import ForbiddenError from '../exceptions/ForbiddenError';
 import LoginPayload from '../domain/requests/LoginPayload';
 import * as sessionService from '../services/sessionService';
-import UnauthorizedError from '../exceptions/UnauthorizedError';
 import roleToScopeMap from '../resources/maps/roleToScopeMap';
+import UnauthorizedError from '../exceptions/UnauthorizedError';
+import ForgotPasswordPayload from '../domain/requests/ForgotPasswordPayload';
 
 const { errors } = lang;
 
@@ -30,7 +34,7 @@ export async function login(loginPayload: LoginPayload) {
     }
   });
 
-  logger.debug('Login: Fetched user by email - ', JSON.stringify(result, null, 2));
+  logger.debug('Login: Fetched user by email -', JSON.stringify(result, null, 2));
 
   if (result) {
     logger.debug(`Login: Comparing request password - ${password} and hashed password - ${result.password}`);
@@ -105,4 +109,41 @@ export async function logout(session: SessionInfo) {
   if (!result) {
     throw new ForbiddenError(errors.invalidToken);
   }
+}
+
+/**
+ * Generate verification token and send email in mentioned email.
+ *
+ * @param {SessionInfo} session
+ */
+export async function forgot(forgotPasswordPayload: ForgotPasswordPayload) {
+  const { email } = forgotPasswordPayload;
+
+  const [[user]] = await spanner.run({
+    json: true,
+    sql: 'SELECT * FROM users where email = @email limit 1',
+    params: {
+      email
+    }
+  });
+
+  logger.debug('Forgot Password: Fetched user by email -', JSON.stringify(user, null, 2));
+
+  if (!user) {
+    throw new NotFoundError(errors.userNotFound);
+  }
+
+  const token = uuid.generateToken();
+  const resetPasswordTokenInfo = {
+    token,
+    user_id: user.id,
+    created_at: new Date()
+  };
+
+  logger.debug('Forgot Password: Inserting reset password token -', JSON.stringify(resetPasswordTokenInfo, null, 2));
+
+  const resetPasswordTokenTable = spanner.table(Table.RESET_PASSWORD_TOKENS);
+  const [result] = await resetPasswordTokenTable.insert([resetPasswordTokenInfo]);
+
+  logger.debug('Forgot Password: Token inserted successfully -', JSON.stringify(result, null, 2));
 }

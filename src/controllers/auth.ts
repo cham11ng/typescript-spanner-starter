@@ -4,6 +4,7 @@ import { Request, Response, NextFunction } from 'express';
 import lang from '../config/lang';
 import JWTPayload from '../domain/misc/JWTPayload';
 import * as authService from '../services/authService';
+import ForgotPasswordPayload from '../domain/requests/ForgotPasswordPayload';
 
 const { messages } = lang;
 
@@ -69,6 +70,28 @@ export async function logout(req: Request, res: Response, next: NextFunction) {
     res.status(HTTPStatus.OK).json({
       code: HTTPStatus.OK,
       message: messages.auth.logoutSuccess
+    });
+  } catch (error) {
+    next(error);
+  }
+}
+
+/**
+ * Handle /forgot request.
+ *
+ * @param {Request} req
+ * @param {Response} res
+ * @param {NextFunction} next
+ */
+export async function forgot(req: Request, res: Response, next: NextFunction) {
+  try {
+    const forgotPasswordPayload = req.body as ForgotPasswordPayload;
+
+    await authService.forgot(forgotPasswordPayload);
+
+    res.status(HTTPStatus.OK).json({
+      code: HTTPStatus.OK,
+      message: messages.auth.forgotSuccess
     });
   } catch (error) {
     next(error);
