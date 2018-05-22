@@ -1,11 +1,11 @@
 import * as HTTPStatus from 'http-status-codes';
 import { Request, Response, NextFunction } from 'express';
 
-import config from '../config/config';
+import lang from '../config/lang';
 import JWTPayload from '../domain/misc/JWTPayload';
 import * as authService from '../services/authService';
 
-const { messages } = config;
+const { messages } = lang;
 
 /**
  * Handle /login request.
@@ -39,6 +39,7 @@ export async function refresh(req: Request, res: Response, next: NextFunction) {
   try {
     const token = String(res.locals.refreshToken);
     const jwtPayload = res.locals.jwtPayload as JWTPayload;
+
     const data = await authService.refresh(token, jwtPayload);
 
     res.status(HTTPStatus.OK).json({
@@ -60,10 +61,9 @@ export async function refresh(req: Request, res: Response, next: NextFunction) {
  */
 export async function logout(req: Request, res: Response, next: NextFunction) {
   try {
-    const {
-      refreshToken: token,
-      jwtPayload: { userId }
-    } = res.locals;
+    const token = String(res.locals.refreshToken);
+    const { userId } = res.locals.jwtPayload as JWTPayload;
+
     await authService.logout({ token, userId });
 
     res.status(HTTPStatus.OK).json({

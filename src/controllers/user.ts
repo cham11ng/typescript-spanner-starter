@@ -1,11 +1,11 @@
 import * as HttpStatus from 'http-status-codes';
 import { Request, Response, NextFunction } from 'express';
 
-import config from '../config/config';
+import lang from '../config/lang';
 import * as userService from '../services/userService';
 import UserPayload from '../domain/requests/UserPayload';
 
-const { messages } = config;
+const { messages } = lang;
 
 /**
  * Controller to handle /users GET request.
