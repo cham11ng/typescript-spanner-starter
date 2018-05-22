@@ -1,7 +1,7 @@
-import config from '../config/config';
+import lang from '../config/lang';
 import logger from '../utils/logger';
 
-const { errors } = config;
+const { errors } = lang;
 
 /**
  * Node startup error handler.

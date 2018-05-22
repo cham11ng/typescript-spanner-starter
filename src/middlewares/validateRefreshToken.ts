@@ -1,13 +1,13 @@
 import { Request, Response, NextFunction } from 'express';
 
+import lang from '../config/lang';
 import * as jwt from '../utils/jwt';
 import logger from '../utils/logger';
-import config from '../config/config';
 import ErrorType from './../resources/enums/ErrorType';
 import BadRequestError from '../exceptions/BadRequestError';
 import UnauthorizedError from '../exceptions/UnauthorizedError';
 
-const { errors } = config;
+const { errors } = lang;
 
 const tokenErrorMessageMap: any = {
   [ErrorType.INVALID]: errors.invalidToken,

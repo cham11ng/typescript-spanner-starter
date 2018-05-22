@@ -1,13 +1,13 @@
 import { Request, Response, NextFunction } from 'express';
 
+import lang from '../config/lang';
 import * as jwt from '../utils/jwt';
 import logger from '../utils/logger';
-import config from '../config/config';
 import ErrorType from './../resources/enums/ErrorType';
 import BadRequestError from '../exceptions/BadRequestError';
 import UnauthorizedError from '../exceptions/UnauthorizedError';
 
-const { errors } = config;
+const { errors } = lang;
 
 const tokenErrorMessageMap: any = {
   [ErrorType.INVALID]: errors.invalidToken,
@@ -32,9 +32,9 @@ async function authenticate(req: Request, res: Response, next: NextFunction) {
     logger.debug('JWT: Verifying token - ', req.headers.authorization, res.locals.accessToken);
     const response: any = jwt.verifyAccessToken(res.locals.accessToken);
 
-    res.locals.loggedInPayload = response.data;
+    res.locals.user = response.data;
 
-    logger.debug('JWT: Authentication verified - ', JSON.stringify(res.locals.loggedInPayload, null, 2));
+    logger.debug('JWT: Authentication verified - ', JSON.stringify(res.locals.user, null, 2));
 
     next();
   } catch (err) {
