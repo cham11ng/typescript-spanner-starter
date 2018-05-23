@@ -5,6 +5,7 @@ import spanner from '../config/spanner';
 import * as jwt from '../utils/jwt';
 import logger from '../utils/logger';
 import * as uuid from '../utils/uuid';
+import * as mail from '../utils/mail';
 import * as bcrypt from '../utils/bcrypt';
 import { getHourDifferenceFromNow } from '../utils/date';
 
@@ -22,6 +23,7 @@ import ForgotPasswordPayload from '../domain/requests/ForgotPasswordPayload';
 import * as sessionService from '../services/sessionService';
 
 const { errors } = lang;
+const { appUrl } = config;
 
 /**
  * Create user session for valid user login.
@@ -145,6 +147,21 @@ export async function forgot(forgotPasswordPayload: ForgotPasswordPayload) {
     user_id: user.id,
     created_at: new Date()
   };
+
+  const url = `${appUrl}/verify?token=${token}&email=${email}`;
+
+  logger.debug('Forgot Password: Sending email -', url);
+
+  await mail.send({
+    to: email,
+    subject: 'Reset Password Verification',
+    html: `
+      <b>Click the verification link to reset password?</b>
+      <a href="${url}">${url}</a>
+    `
+  });
+
+  logger.debug('Forgot Password: Reset Password verification mail sent');
 
   logger.debug('Forgot Password: Inserting reset password token -', JSON.stringify(resetPasswordTokenInfo, null, 2));
 
