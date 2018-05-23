@@ -1,20 +1,25 @@
 import lang from '../config/lang';
+import config from '../config/config';
+import spanner from '../config/spanner';
+
 import * as jwt from '../utils/jwt';
 import logger from '../utils/logger';
 import * as uuid from '../utils/uuid';
-import spanner from '../config/spanner';
 import * as bcrypt from '../utils/bcrypt';
+import { getHourDifferenceFromNow } from '../utils/date';
+
 import Table from '../resources/enums/Table';
 import JWTPayload from '../domain/misc/JWTPayload';
 import SessionInfo from '../domain/misc/SessionInfo';
 import NotFoundError from '../exceptions/NotFoundError';
 import ForbiddenError from '../exceptions/ForbiddenError';
 import LoginPayload from '../domain/requests/LoginPayload';
-import * as sessionService from '../services/sessionService';
 import roleToScopeMap from '../resources/maps/roleToScopeMap';
 import UnauthorizedError from '../exceptions/UnauthorizedError';
 import ResetPasswordPayload from '../domain/requests/ResetPasswordPayload';
 import ForgotPasswordPayload from '../domain/requests/ForgotPasswordPayload';
+
+import * as sessionService from '../services/sessionService';
 
 const { errors } = lang;
 
@@ -158,7 +163,7 @@ export async function reset(forgotPasswordPayload: ResetPasswordPayload) {
   const { token, email } = forgotPasswordPayload;
   const [[result]] = await spanner.run({
     json: true,
-    sql: `SELECT users.* FROM reset_password_tokens
+    sql: `SELECT users.*, reset_password_tokens.created_at AS token_created_at FROM reset_password_tokens
         INNER JOIN users 
         ON reset_password_tokens.user_id = users.id 
         WHERE email = @email
@@ -173,6 +178,15 @@ export async function reset(forgotPasswordPayload: ResetPasswordPayload) {
 
   if (!result) {
     throw new NotFoundError(errors.invalidToken);
+  }
+
+  const { emailVerificationDuration } = config.auth;
+  const hourDiff = getHourDifferenceFromNow(result.token_created_at);
+
+  logger.debug('Reset Password: Token duration -', hourDiff);
+
+  if (hourDiff >= emailVerificationDuration) {
+    throw new ForbiddenError(errors.verificationTokenExpired);
   }
 
   const resetPasswordTokenInfo = [token, result.id];
