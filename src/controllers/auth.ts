@@ -2,6 +2,7 @@ import * as HTTPStatus from 'http-status-codes';
 import { Request, Response, NextFunction } from 'express';
 
 import lang from '../config/lang';
+import logger from '../utils/logger';
 import JWTPayload from '../domain/misc/JWTPayload';
 import * as authService from '../services/authService';
 import ResetPasswordPayload from '../domain/requests/ResetPasswordPayload';
@@ -88,6 +89,8 @@ export async function forgot(req: Request, res: Response, next: NextFunction) {
   try {
     const forgotPasswordPayload = req.body as ForgotPasswordPayload;
 
+    logger.debug('Forgot Password: Payload -', JSON.stringify(forgotPasswordPayload, null, 2));
+
     await authService.forgot(forgotPasswordPayload);
 
     res.status(HTTPStatus.OK).json({
@@ -108,9 +111,11 @@ export async function forgot(req: Request, res: Response, next: NextFunction) {
  */
 export async function reset(req: Request, res: Response, next: NextFunction) {
   try {
-    const forgotPasswordPayload = req.body as ResetPasswordPayload;
+    const resetPasswordPayload = req.body as ResetPasswordPayload;
 
-    await authService.reset(forgotPasswordPayload);
+    logger.debug('Reset Password: Payload -', JSON.stringify(resetPasswordPayload, null, 2));
+
+    await authService.reset(resetPasswordPayload);
 
     res.status(HTTPStatus.OK).json({
       code: HTTPStatus.OK,
