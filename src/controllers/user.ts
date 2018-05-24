@@ -2,7 +2,7 @@ import * as HttpStatus from 'http-status-codes';
 import { Request, Response, NextFunction } from 'express';
 
 import lang from '../config/lang';
-import * as userService from '../services/userService';
+import * as userService from '../services/user';
 import UserPayload from '../domain/requests/UserPayload';
 
 const { messages } = lang;

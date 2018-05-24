@@ -1,16 +1,16 @@
 {
   "auth": {
-    "loginSuccess": "Login successful.",
-    "resetSuccess": "Password reset request successful.",
+    "accessTokenRefreshed": "Access token refreshed successfully.",
     "forgotSuccess": "Forgot password request successful. Check email.",
-    "logoutSuccess": "Logout successful.",
     "invalidCredentials": "Invalid Credentials",
-    "accessTokenRefreshed": "Access token refreshed successfully."
+    "loginSuccess": "Login successful.",
+    "logoutSuccess": "Logout successful.",
+    "resetSuccess": "Password reset request successful."
   },
   "users": {
-    "insert": "User inserted successfully.",
-    "fetch": "User detail fetched successfully.",
     "delete": "User removed successfully.",
-    "fetchAll": "List of users."
+    "fetch": "User detail fetched successfully.",
+    "fetchAll": "List of users.",
+    "insert": "User inserted successfully."
   }
 }

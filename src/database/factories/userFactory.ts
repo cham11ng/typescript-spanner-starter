@@ -1,7 +1,7 @@
 import faker from 'faker';
 
+import * as userService from '../../services/user';
 import UserDetail from '../../domain/entities/UserDetail';
-import * as userService from '../../services/userService';
 
 /**
  * Returns user fake data.

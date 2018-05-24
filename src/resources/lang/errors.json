@@ -1,13 +1,14 @@
 {
-  "portInUse": "Port is already in use.",
-  "userNotFound": "User does not exist.",
+  "accessTokenExpired": "Access token expired.",
   "invalidToken": "Your token is invalid.",
   "invalidCredentials": "Invalid Credentials",
-  "accessTokenExpired": "Access token expired.",
+  "jwtTokenExpired": "JWT token expired.",
   "noToken": "No token in authorization header.",
-  "sessionNotMaintained": "Session not maintained.",
-  "refreshTokenExpired": "Session has been expired.",
-  "verificationTokenExpired": "Verification token expired.",
+  "portInUse": "Port is already in use.",
   "portRequirePrivilege": "Port requires elevated privileges.",
-  "unAuthorized": "You are not authorized to perform this action."
+  "refreshTokenExpired": "Session expired.",
+  "sessionNotMaintained": "Session not maintained.",
+  "unAuthorized": "You are not authorized to perform this action.",
+  "userNotFound": "User does not exist.",
+  "verificationTokenExpired": "Verification token expired."
 }
