@@ -25,6 +25,13 @@ router.post('/forgot', validate.schema(forgotSchema), passwordController.forgot)
 router.post('/reset', validate.schema(resetSchema), passwordController.reset);
 
 router.get('/users', authenticate, acl, userController.index);
-router.post('/users', authenticate, acl, validate.schema(userPOSTSchema), userController.store);
+router.post(
+  '/users',
+  authenticate,
+  acl,
+  validate.schema(userPOSTSchema),
+  validate.unique(['users:email']),
+  userController.store
+);
 
 export default router;
