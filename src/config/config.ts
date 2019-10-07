@@ -9,8 +9,9 @@ const isTestEnvironment = process.env.NODE_ENV === 'test';
 export default {
   name: app.name,
   version: app.version,
-  environment: process.env.NODE_ENV || 'development',
   host: process.env.APP_HOST || '127.0.0.1',
+  environment: process.env.NODE_ENV || 'development',
+  appUrl: process.env.APP_URL || 'http://prenav.poc',
   port: (isTestEnvironment ? process.env.TEST_APP_PORT : process.env.APP_PORT) || '8000',
   pagination: {
     page: 1,
@@ -25,6 +26,7 @@ export default {
     saltRounds: process.env.SALT_ROUNDS || 11,
     accessTokenDuration: process.env.ACCESS_TOKEN_DURATION || '10m',
     refreshTokenDuration: process.env.REFRESH_TOKEN_DURATION || '24h',
+    emailVerificationDuration: process.env.EMAIL_VERIFICATION_DURATION || 24,
     accessTokenSecretKey: process.env.ACCESS_TOKEN_SECRET_KEY || '<ACCESS_TOKEN_SECRET_KEY>',
     refreshTokenSecretKey: process.env.REFRESH_TOKEN_SECRET_KEY || '<REFRESH_TOKEN_SECRET_KEY>'
   },

@@ -1,20 +1,18 @@
 import lang from '../config/lang';
+import spanner from '../config/spanner';
+
 import * as jwt from '../utils/jwt';
 import logger from '../utils/logger';
-import * as uuid from '../utils/uuid';
-import spanner from '../config/spanner';
 import * as bcrypt from '../utils/bcrypt';
-import Table from '../resources/enums/Table';
+
 import JWTPayload from '../domain/misc/JWTPayload';
 import SessionInfo from '../domain/misc/SessionInfo';
-import NotFoundError from '../exceptions/NotFoundError';
 import ForbiddenError from '../exceptions/ForbiddenError';
 import LoginPayload from '../domain/requests/LoginPayload';
-import * as sessionService from '../services/sessionService';
 import roleToScopeMap from '../resources/maps/roleToScopeMap';
 import UnauthorizedError from '../exceptions/UnauthorizedError';
-import ResetPasswordPayload from '../domain/requests/ResetPasswordPayload';
-import ForgotPasswordPayload from '../domain/requests/ForgotPasswordPayload';
+
+import * as sessionService from '../services/session';
 
 const { errors } = lang;
 
@@ -110,86 +108,4 @@ export async function logout(session: SessionInfo) {
   if (!result) {
     throw new ForbiddenError(errors.invalidToken);
   }
-}
-
-/**
- * Generate verification token and send email in mentioned email.
- *
- * @param {SessionInfo} session
- */
-export async function forgot(forgotPasswordPayload: ForgotPasswordPayload) {
-  const { email } = forgotPasswordPayload;
-
-  const [[user]] = await spanner.run({
-    json: true,
-    sql: 'SELECT * FROM users where email = @email limit 1',
-    params: {
-      email
-    }
-  });
-
-  logger.debug('Forgot Password: Fetched user by email -', JSON.stringify(user, null, 2));
-
-  if (!user) {
-    throw new NotFoundError(errors.userNotFound);
-  }
-
-  const token = uuid.generateToken();
-  const resetPasswordTokenInfo = {
-    token,
-    user_id: user.id,
-    created_at: new Date()
-  };
-
-  logger.debug('Forgot Password: Inserting reset password token -', JSON.stringify(resetPasswordTokenInfo, null, 2));
-
-  const resetPasswordTokenTable = spanner.table(Table.RESET_PASSWORD_TOKENS);
-  const [result] = await resetPasswordTokenTable.insert([resetPasswordTokenInfo]);
-
-  logger.debug('Forgot Password: Token inserted successfully -', JSON.stringify(result, null, 2));
-}
-
-/**
- * Reset password using verification.
- *
- * @param {SessionInfo} session
- */
-export async function reset(forgotPasswordPayload: ResetPasswordPayload) {
-  const { token, email } = forgotPasswordPayload;
-
-  const [[forgotPasswordToken]] = await spanner.run({
-    json: true,
-    sql: `SELECT * FROM reset_password_tokens 
-        INNER JOIN users 
-        ON reset_password_tokens.user_id = users.id 
-        WHERE email = @email
-        AND token = @token`,
-    params: {
-      email,
-      token
-    }
-  });
-
-  logger.debug('Forgot Password: Fetched token by token and email -', JSON.stringify(forgotPasswordToken, null, 2));
-
-  if (!forgotPasswordToken) {
-    throw new NotFoundError(errors.invalidToken);
-  }
-
-  const password = await bcrypt.hash(forgotPasswordPayload.password);
-  const userInfo = {
-    password,
-    id: forgotPasswordToken.user_id,
-    role_id: forgotPasswordToken.role_id
-  };
-
-  logger.debug('Forgot Password: Updating user with new password -', JSON.stringify(userInfo, null, 2));
-  const userTable = await spanner.table(Table.USERS);
-  const [updateResult] = await userTable.update([userInfo]);
-  logger.debug('Forgot Password: Updated user with new password -', JSON.stringify(updateResult, null, 2));
-
-  logger.debug('Forgot Password: Deleting reset password token -', JSON.stringify(forgotPasswordToken, null, 2));
-  const resetPasswordTokenTable = spanner.table(Table.RESET_PASSWORD_TOKENS);
-  const [result] = await resetPasswordTokenTable.deleteRows([[token, forgotPasswordToken.user_id]]);
-  logger.debug('Forgot Password: Token removed successfully -', JSON.stringify(result, null, 2));
 }
